@@ -127,7 +127,6 @@ class InputModel {
     int positionCode = -1;
     int platformCode = -1;
     bool down;
-
     if (e.data is RawKeyEventDataMacOs) {
       RawKeyEventDataMacOs newData = e.data as RawKeyEventDataMacOs;
       positionCode = newData.keyCode;
@@ -209,6 +208,87 @@ class InputModel {
   /// [down] indicates the key's state(down or up).
   /// [press] indicates a click event(down and up).
   void inputKey(String name, {bool? down, bool? press}) {
+    debugPrint('$name d:$down p:$press alt:$alt ctrl:$ctrl shift:$shift command:$command');
+    if("âôäí•".indexOf(name)!=-1) {
+      //ctrl alt window shift release
+      switch(name){
+        case "â":
+          ctrl=true;
+          break;
+        case "ô":
+          alt=true;
+          break;
+        case "ä":
+          command=true;
+          break;
+        case "í":
+          shift=true;
+          break;
+        case "•":
+          ctrl=false;
+          alt=false;
+          command=false;
+          shift=false;
+          break;
+      }
+      return;
+    }
+    if(name=="Ä"){
+      name="VK_RWIN";
+      command=true;
+      down=true;
+    }
+    if(name=="Í"){
+      name="VK_SHIFT";
+      shift=true;
+      down=true;
+    }
+    if(name=="Ä"){
+      name="VK_RWIN";
+      command=true;
+      down=true;
+    }
+    if(name=="Â"){
+      name="VK_LCONTROL";
+      ctrl=true;
+      down=true;
+    }
+    if(name=="Ô"){
+      name="VK_MENU";
+      alt=true;
+      down=true;
+    }
+    if(name=="‘") {
+      name="VK_ESCAPE";
+      down=true;
+    }
+    if(name=="÷") {
+      name="VK_DELETE";
+      down=true;
+    }
+    if(name=="×") {
+      name="VK_INSERT";
+      down=true;
+    }
+    if(name=="–"){
+      name="VK_HOME";
+      down=true;
+    }
+    if(name=="—"){
+      name="VK_END";
+      down=true;
+    }
+    if(name=="¶"){
+      name="VK_PRIOR";
+      down=true;
+    }
+    if(name=="ª"){
+      name="VK_NEXT";
+      down=true;
+    }
+
+    var shiftm='ABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#\$%^&*()_+{}|:"<>?'.indexOf(name)!=-1;
+    debugPrint("$name $shiftm");
     if (!keyboardPerm) return;
     bind.sessionInputKey(
         sessionId: sessionId,
@@ -217,7 +297,7 @@ class InputModel {
         press: press ?? true,
         alt: alt,
         ctrl: ctrl,
-        shift: shift,
+        shift: shift||shiftm,
         command: command);
   }
 
@@ -229,7 +309,6 @@ class InputModel {
     if (shift) out['shift'] = 'true';
     if (ctrl) out['ctrl'] = 'true';
     if (command) out['command'] = 'true';
-
     // Check update event type and set buttons to be sent.
     int buttons = _lastButtons;
     if (type == _kMouseEventMove) {
